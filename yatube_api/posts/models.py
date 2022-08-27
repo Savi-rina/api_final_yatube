@@ -20,7 +20,7 @@ class Post(models.Model):
         User, on_delete=models.CASCADE, related_name='posts')
     group = models.ForeignKey(Group, null=True, blank=True,
                               on_delete=models.SET_NULL, related_name='posts',
-                              verbose_name='group')
+                              verbose_name='группа')
     image = models.ImageField(
         upload_to='posts/', null=True, blank=True)
 

@@ -13,7 +13,8 @@ class GroupSerializer(serializers.ModelSerializer):
 class PostSerializer(serializers.ModelSerializer):
     """Сериалайзер для объектов модели Post."""
     author = serializers.SlugRelatedField(
-        read_only=True, slug_field='username'
+        read_only=True,
+        slug_field='username',
     )
 
     class Meta:
@@ -24,7 +25,8 @@ class PostSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     """Сериалайзер для объектов модели Comment."""
     author = serializers.SlugRelatedField(
-        read_only=True, slug_field='username'
+        read_only=True,
+        slug_field='username',
     )
 
     class Meta:
@@ -42,7 +44,7 @@ class FollowSerializer(serializers.ModelSerializer):
     )
     following = serializers.SlugRelatedField(
         queryset=User.objects.all(),
-        slug_field='username'
+        slug_field='username',
     )
 
     class Meta:

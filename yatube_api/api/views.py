@@ -2,16 +2,22 @@ from django.shortcuts import get_object_or_404
 from rest_framework import filters, mixins, viewsets
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import (IsAuthenticated,
-                                        IsAuthenticatedOrReadOnly)
+                                        IsAuthenticatedOrReadOnly,
+                                        )
 
+from .serializers import (CommentSerializer,
+                          FollowSerializer,
+                          GroupSerializer,
+                          PostSerializer,
+                          )
 from posts.models import Group, Post
 from .permissions import IsAuthorOrReadOnly
-from .serializers import (CommentSerializer, FollowSerializer, GroupSerializer,
-                          PostSerializer)
 
 
-class CreateListViewSetMixin(mixins.CreateModelMixin, mixins.ListModelMixin,
-                             viewsets.GenericViewSet):
+class CreateListViewSetMixin(mixins.CreateModelMixin,
+                             mixins.ListModelMixin,
+                             viewsets.GenericViewSet,
+                             ):
     """Собираем вьюсет, который будет создавать подписку
      для пользователя, сделавшего запрос на пользователя, переданного
     в теле запроса и

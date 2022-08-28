@@ -1,24 +1,26 @@
-from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from posts.models import Group, Post
 from rest_framework import filters, mixins, viewsets
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 
+from posts.models import Group, Post
 from .permissions import IsAuthorOrReadOnly
 from .serializers import (CommentSerializer, FollowSerializer, GroupSerializer,
                           PostSerializer)
 
-User = get_user_model()
-
 
 class CreateListViewSetMixin(mixins.CreateModelMixin, mixins.ListModelMixin,
                              viewsets.GenericViewSet):
+    """Собираем вьюсет, который будет создавать подписку
+     для пользователя, сделавшего запрос на пользователя, переданного
+    в теле запроса и
+    возвращать все подписки искомого пользователя."""
     pass
 
 
 class PostViewSet(viewsets.ModelViewSet):
+    """Вьюсет для выполнения операций с объектами модели Post."""
     serializer_class = PostSerializer
     queryset = Post.objects.all()
     permission_classes = (IsAuthorOrReadOnly,)
@@ -29,6 +31,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
 
 class CommentViewSet(viewsets.ModelViewSet):
+    """Вьюсет для выполнения операций с объектами модели Comment."""
     serializer_class = CommentSerializer
     permission_classes = (IsAuthorOrReadOnly,)
 
@@ -41,17 +44,19 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         post_id = self.kwargs.get('post_id')
-        post = Post.objects.get(id=post_id)
+        post = get_object_or_404(Post, pk=post_id)
         serializer.save(author=self.request.user, post=post)
 
 
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):
+    """Вьюсет для выполнения операций с объектами модели Group."""
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
 
 class FollowViewSet(CreateListViewSetMixin):
+    """Вьюсет для выполнения операций с объектами модели Follow."""
     serializer_class = FollowSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('user__username', 'following__username',)
@@ -61,6 +66,5 @@ class FollowViewSet(CreateListViewSetMixin):
         serializer.save(user=self.request.user)
 
     def get_queryset(self):
-        user = get_object_or_404(User, username=self.request.user.username)
 
-        return user.follower.all()
+        return self.request.user.follower.all()
